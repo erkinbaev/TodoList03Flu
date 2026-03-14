@@ -12,8 +12,8 @@ class Todo {
   Todo({required this.id, required this.title, required this.date, required this.isDone});
 }
 
-class TodoColor {
- int r = 0;
- int g = 0;
- int b = 0;
-}
+// class TodoColor {
+//  int r = 0;
+//  int g = 0;
+//  int b = 0;
+// }
