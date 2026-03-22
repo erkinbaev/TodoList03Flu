@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list_03flu/add/add_page.dart';
 import 'package:todo_list_03flu/database/app_database.dart';
 import 'package:todo_list_03flu/database/app_repository.dart';
@@ -6,8 +7,7 @@ import 'package:todo_list_03flu/home/home_state.dart';
 import 'package:todo_list_03flu/home/home_view_model.dart';
 import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:todo_list_03flu/todo.dart';
+import 'package:todo_list_03flu/settings/settings_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
@@ -20,6 +20,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late final HomeCubit cubit;
+  late SharedPreferences preferences;
+  late Color _backgroundColor = Theme.of(context).colorScheme.inversePrimary;
 
   @override
   void initState() {
@@ -28,12 +30,14 @@ class _MyHomePageState extends State<MyHomePage> {
     print("Home page initState");
     //Здесь запускаются таймеры или анимации
     //Подтягивать данные с локального хранения или с интернета
+    _getPreferences();
 
     final db = AppDatabase();
     final repo = AppRepositoryImpl(db);
     final vm = HomeViewModel(repo: repo);
     cubit = HomeCubit(vm: vm);
     cubit.fetchList();
+    
   }
 
   @override
@@ -54,12 +58,19 @@ class _MyHomePageState extends State<MyHomePage> {
             if (state.isError) {
               return Center(child: Text("Возникла ошибка при работе с данными!"));
             } else if (state.items.isEmpty) {
-              return Center(child: Text("Ваш список задач пуст"));
+              return Center(child: Column(
+                children: [
+                  Text("Ваш список задач пуст"),
+                  TextButton(
+                onPressed: () => _naviagateToAddPage(), child: Text("Добавить задачу"),
+              )
+                ],
+              ));
             }
 
               return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: _backgroundColor,
         title: Text(widget.title),
       ),
       body: Center(
@@ -97,9 +108,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _naviagateToAddPage() async {
     final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => const AddPage()));
+    cubit.fetchList();
     if (result != null) {
       print("текст со второго экрана: $result");
     }
+  }
+
+  void _naviagateToSettingsPage() {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
+  }
+
+  void _getPreferences() async {
+    preferences = await SharedPreferences.getInstance();
+
+    bool isDarkTheme = preferences.getBool('isDarkTheme') ?? false;
+    String code = preferences.getString('code') ?? "";
+    int progress = preferences.getInt('progress') ?? 0;
+
+    if (isDarkTheme == true) {
+      setState(() {
+        _backgroundColor = Theme.of(context).colorScheme.inverseSurface;
+      });
+    } else {
+      setState(() {
+         _backgroundColor = Theme.of(context).colorScheme.inversePrimary;
+      });
+    }
+    print('isDarktheme: $isDarkTheme');
+    print('code: $code');
+    print('progress $progress');
   }
 
   @override

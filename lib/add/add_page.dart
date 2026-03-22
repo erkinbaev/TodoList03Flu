@@ -3,6 +3,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:todo_list_03flu/database/app_database.dart';
+import 'package:todo_list_03flu/main.dart';
 
 class AddPage extends StatefulWidget {
 
@@ -57,7 +59,10 @@ class _AddPage extends State<AddPage> {
               border: OutlineInputBorder()
             ),
           ),
-          TextButton(onPressed: () => Navigator.pop(context, _controller.text), child: Text("Сохранить"))
+          TextButton(
+            onPressed: () => _saveTodo() , 
+              child: Text("Сохранить")
+              )
         ],
       ),
     );
@@ -77,6 +82,13 @@ class _AddPage extends State<AddPage> {
     super.deactivate();
     print("Add page deactivate");
     //срабатывает перед тем как экран пропадет с виду, но в памяти еще хранится
+  }
+
+  void _saveTodo() async {
+   await appDatabase.insertTodo(TodosCompanion.insert(
+              title: _controller.text, 
+              date: DateTime.now().toString()));
+              Navigator.pop(context);
   }
 
   @override

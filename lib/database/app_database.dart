@@ -1,26 +1,32 @@
 
-import 'package:todo_list_03flu/todo.dart';
+import 'dart:io';
+import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
+import 'package:todo_list_03flu/database/todos.dart';
+part 'app_database.g.dart';
 
-class AppDatabase {
-  //MOCK - данные, временные данные
-  List<Todo> _todoList = [
-    // Todo(id: 1, title: "сделать дз 1", date: "01.01.2026", isDone: true), 
-    // Todo(id: 2, title: "сделать дз 3", date: "03.02.2026", isDone: true),
-    // Todo(id: 1, title: "сделать дз 2", date: DateTime.now().toString(), isDone: true), 
-    // Todo(id: 1, title: "сделать дз 4", date: "24.01.2026", isDone: true)
-    ];
+@DriftDatabase(tables: [Todos])
+class AppDatabase extends _$AppDatabase {
+  AppDatabase() : super(_openConnection());
 
-  //CRUD - operations 
+  @override
+  int get schemaVersion => 1;
 
-  //READ
-  Future<List<Todo>> getList() async {
-    return List.unmodifiable(_todoList);
+  Future<List<Todo>> getTodoList() {
+    return select(todos).get();
   }
 
-  //CREATE 
+  Future<int> insertTodo(TodosCompanion todo) {
+    return into(todos).insert(todo);
+  }
+}
 
-  //UPDATE
-
-  //DELETE
-
+LazyDatabase _openConnection() {
+  return LazyDatabase(() async {
+    final dbFolder = await getApplicationCacheDirectory();
+    final file = File(p.join(dbFolder.path, 'app.db'));
+    return NativeDatabase(file);
+  });
 }

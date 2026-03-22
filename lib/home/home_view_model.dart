@@ -1,6 +1,6 @@
+import 'package:todo_list_03flu/database/app_database.dart';
 import 'package:todo_list_03flu/database/app_repository.dart';
 import 'package:todo_list_03flu/home/home_state.dart';
-import 'package:todo_list_03flu/todo.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeViewModel {
@@ -23,7 +23,7 @@ class HomeCubit extends Cubit<HomeState> {
       final items = await vm.fetchList(); 
       //эти строки будут ждать завершения верхней строки, так как стоит await
       if (items.isEmpty) {
-        emit(state.copyWith(items: [], isError: true));
+        emit(state.copyWith(items: [], isError: false));
       } else {
         emit(state.copyWith(items: items, isError: false));
       }

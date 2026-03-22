@@ -1,6 +1,5 @@
 
 import 'package:todo_list_03flu/database/app_database.dart';
-import 'package:todo_list_03flu/todo.dart';
 
 abstract class AppRepository {
   //набор доступных функция для работы с хранилищем (обертка над хранилищем)
@@ -15,6 +14,6 @@ class AppRepositoryImpl extends AppRepository {
   AppRepositoryImpl(this.db);
 
   @override
-  Future<List<Todo>> getList() => db.getList();
+  Future<List<Todo>> getList() => db.getTodoList();
 }
 
