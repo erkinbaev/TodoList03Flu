@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:todo_list_03flu/add/add_page.dart';
 import 'package:todo_list_03flu/database/app_database.dart';
 import 'package:todo_list_03flu/database/app_repository.dart';
+import 'package:todo_list_03flu/details_page.dart';
 import 'package:todo_list_03flu/home/home_state.dart';
 import 'package:todo_list_03flu/home/home_view_model.dart';
 import 'dart:math';
@@ -81,6 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 final todo = state.items[index];
                 return ListTile(
                   title: Text(todo.title),
+                  onTap: () => _naviagateToDetailsPage(todo),
                 );
               }
               ),
@@ -116,6 +118,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _naviagateToSettingsPage() {
     Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsPage()));
+  }
+
+  void _naviagateToDetailsPage(Todo todo) async {
+    final result = await Navigator.push(context, MaterialPageRoute(builder: (_) => DetailsPage(todo: todo)));
+    cubit.fetchList();
   }
 
   void _getPreferences() async {
