@@ -85,10 +85,15 @@ class _AddPage extends State<AddPage> {
   }
 
   void _saveTodo() async {
-   await appDatabase.insertTodo(TodosCompanion.insert(
+    try {
+        await appDatabase.insertTodo(TodosCompanion.insert(
               title: _controller.text, 
               date: DateTime.now().toString()));
-              Navigator.pop(context);
+          await showAppSnackBar(context, text: "Сохранено!", backgroundColor: Colors.green, icon: Icons.check);
+          Future.delayed(Duration(seconds: 2), () => Navigator.pop(context));
+    } catch (e) {
+      showAppSnackBar(context, text: "Должно быть минимум 3 символа!", backgroundColor: Colors.red, icon: Icons.error);
+    }
   }
 
   @override
@@ -100,4 +105,42 @@ class _AddPage extends State<AddPage> {
     //уничтожает экран и здесь надо выключать фоновые задачи, таймеры и т.д
 
   }
+
+  Future <void> showAppSnackBar(
+  BuildContext context, {
+  required String text,
+  Color? backgroundColor,
+  IconData? icon,
+  VoidCallback? onRetry,
+  String retryText = "Повторить",
+}) async {
+  final messenger = ScaffoldMessenger.of(context);
+
+  messenger.hideCurrentSnackBar();
+  messenger.showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: Colors.white),
+            const SizedBox(width: 12),
+          ],
+          Expanded(child: Text(text)),
+        ],
+      ),
+      backgroundColor: backgroundColor,
+      behavior: SnackBarBehavior.floating,
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 400),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      duration: const Duration(seconds: 1),
+      action: onRetry == null
+          ? null
+          : SnackBarAction(
+              label: retryText,
+              onPressed: onRetry,
+              textColor: Colors.white,
+            ),
+    ),
+  );
+}
 }

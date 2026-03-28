@@ -2,6 +2,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list_03flu/database/app_database.dart';
+import 'package:todo_list_03flu/extensions/build_context_extension.dart';
 import 'package:todo_list_03flu/main.dart';
 
 class DetailsPage extends StatefulWidget{
@@ -50,13 +51,18 @@ class _DetailsPage extends State<DetailsPage> {
   Future<void> _updateTodo() async {
     late final String newTitle;
     newTitle = _controller.text;
-
-    await appDatabase.updateTodo(widget.todo.id, TodosCompanion(id: Value(widget.todo.id), title: Value(newTitle)));
-    Navigator.pop(context);
+    try {
+      await appDatabase.updateTodo(widget.todo.id, TodosCompanion(id: Value(widget.todo.id), title: Value(newTitle)));
+      //await cubit.updateTodo();
+      Navigator.pop(context);
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> _deleteTodo() async {
     await appDatabase.deleteTodo(widget.todo.id);
+    context.showAppSnackBar(context, text: "Удалено!", backgroundColor: Colors.green);
     Navigator.pop(context);
   }
 
